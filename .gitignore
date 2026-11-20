@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Session storage & live credentials
+config/naukri_auth.json
+.chrome-session/
+.login-session/
+
+# Local data & application history
+data/*.json
+!data/.gitkeep
+
+# Proof screenshots
+proofs/
+!proofs/.gitkeep
+*.png
+*.jpg
+*.jpeg
+
+# Scratch scripts & temporary logs
+scratch/
+*.log
+.DS_Store
+.env

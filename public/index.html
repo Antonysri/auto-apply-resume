@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoApply AI | 100-Job Batch Auto-Apply & Naukri Sync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>AutoApply AI</h1>
+          <p class="tagline">100-Job Autonomous Batch Apply • Easy Apply & Company Portal Solver</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="status-indicator" id="naukri-auth-badge">
+          <span class="status-dot"></span>
+          <span class="status-text" id="naukri-auth-text">Checking Naukri Session...</span>
+        </div>
+        <button id="btn-connect-naukri" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">
+          🔑 Link Naukri Account
+        </button>
+        <div class="candidate-badge" id="candidate-badge">
+          <span class="avatar">AS</span>
+          <div class="candidate-meta">
+            <span class="name" id="badge-name">Antony S</span>
+            <span class="role">Node.js & Full Stack</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <section class="stats-grid">
+      <div class="stat-card" id="card-total">
+        <div class="stat-icon icon-total">📋</div>
+        <div class="stat-info">
+          <span class="stat-label">Total Applied</span>
+          <span class="stat-value" id="stat-total">0</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-success">
+        <div class="stat-icon icon-success">⚡</div>
+        <div class="stat-info">
+          <span class="stat-label">Naukri 1-Click Easy Apply</span>
+          <span class="stat-value" id="stat-success">0</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-ats">
+        <div class="stat-icon icon-ats">🏢</div>
+        <div class="stat-info">
+          <span class="stat-label">Company Sites Applied</span>
+          <span class="stat-value" id="stat-company">0</span>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-failed">
+        <div class="stat-icon icon-failed">🛡️</div>
+        <div class="stat-info">
+          <span class="stat-label">Filtered (.NET/Java/Python)</span>
+          <span class="stat-value" id="stat-pending">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Grid: Live Execution Console & Actions -->
+    <main class="dashboard-grid">
+      <!-- Left Column: 100-Jobs Batch Auto-Apply & Live Terminal -->
+      <section class="console-section">
+        
+        <!-- Job Search & Smart Filter Engine Card -->
+        <div class="glass-card action-widget highlight-card">
+          <div class="card-header">
+            <div>
+              <h3>🔍 Job Search & Smart Filter Engine</h3>
+              <p class="section-desc" style="margin-bottom: 0;">Configure target role, location, apply type, and min salary. Click "SEARCH & FILTER JOBS" to fetch jobs matching your position title (skipping Lead, Tech Lead, .NET, Java, Python).</p>
+            </div>
+            <span class="badge" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff; border-color: rgba(0, 210, 255, 0.35);">Live Filter</span>
+          </div>
+
+          <div class="batch-controls-grid" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Role Keyword</label>
+              <input type="text" id="batch-keyword" value="Node.js Developer">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Location</label>
+              <input type="text" id="batch-location" value="Chennai, Bangalore, Thiruvananthapuram, Hyderabad">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Apply Type Filter</label>
+              <select id="filter-apply-type" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: #fff; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; width: 100%;">
+                <option value="easy_apply" selected>⚡ Easy Apply Only (Naukri 1-Click)</option>
+                <option value="company_site">🏢 Apply on Company Site Only</option>
+                <option value="all">🌐 All Jobs (Easy Apply + Company Portals)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Min Salary (LPA)</label>
+              <input type="number" id="filter-min-salary" placeholder="e.g. 4 or 5 LPA (optional)" min="0" step="0.5" value="" style="font-weight: 700; color: #34d399;">
+              <label style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <input type="checkbox" id="filter-include-unspecified-sal" checked>
+                <span>Include "Not disclosed"</span>
+              </label>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Experience (Years)</label>
+              <input type="number" id="filter-experience" placeholder="e.g. 1, 2, 3, or 5 Yrs" min="0" max="25" step="1" value="5" style="font-weight: 700; color: #a78bfa;">
+              <span style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block;">Default: 5 Yrs (<= 5 yrs). Custom e.g. 1, 2, 3</span>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Date Posted / Freshness</label>
+              <select id="filter-freshness" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: #fff; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; width: 100%;">
+                <option value="all" selected>📅 All Days (Any Time)</option>
+                <option value="1">⏱️ Past 24 Hours (1 Day)</option>
+                <option value="3">⚡ Last 3 Days</option>
+                <option value="7">📆 Last 7 Days (Past Week)</option>
+                <option value="15">🗓️ Last 15 Days</option>
+                <option value="30">📅 Last 30 Days (Past Month)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Max Jobs Count</label>
+              <input type="number" id="batch-target-count" value="25" min="5" max="250" style="font-weight: 700; color: #00d2ff;">
+            </div>
+          </div>
+
+          <div class="filter-badges-row">
+            <div class="badge-item positive">
+              <span>🎯 Title Match:</span>
+              <strong>Position Title Must Match Keyword (Node.js, React, MERN, PHP)</strong>
+            </div>
+            <div class="badge-item negative">
+              <span>🚫 Strict Filter:</span>
+              <strong>Never Apply to Lead, Tech Lead, .NET, Java, or Python Jobs</strong>
+            </div>
+            <div class="badge-item" id="applied-history-badge" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.4); color: #34d399; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 1 1 100%;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span>🛡️ Naukri Account Verified:</span>
+                <strong id="applied-history-stat-text">517 Jobs (395 Companies) Excluded</strong>
+              </div>
+              <button id="btn-sync-applied" type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px; font-weight: 700; height: auto; border-radius: 4px; background: rgba(16, 185, 129, 0.25); border: 1px solid rgba(16, 185, 129, 0.6); color: #fff; cursor: pointer;">
+                🔄 Sync Now
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-actions-row" style="margin-top: 16px;">
+            <button id="btn-filter-jobs" class="btn btn-primary full-width" style="padding: 14px 20px; font-size: 15px; font-weight: 800; letter-spacing: 0.5px; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); box-shadow: 0 4px 20px rgba(0, 210, 255, 0.35); display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <span>SEARCH & FILTER JOBS</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Agent Execution Terminal -->
+        <div class="glass-card terminal-card">
+          <div class="card-header">
+            <div class="terminal-title">
+              <span class="terminal-dot red"></span>
+              <span class="terminal-dot yellow"></span>
+              <span class="terminal-dot green"></span>
+              <h3>Live Agent Console</h3>
+            </div>
+            <button id="btn-clear-logs" class="btn-text">Clear</button>
+          </div>
+          <div class="terminal-body" id="terminal-logs">
+            <div class="log-entry info"><span class="timestamp">[Ready]</span> AutoApply AI Batch Engine ready. Target: 100 Jobs.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Candidate Profile & Quick Settings -->
+      <section class="profile-section">
+        <div class="glass-card">
+          <div class="tabs-header">
+            <button class="tab-btn active" data-tab="tab-profile">Candidate Profile</button>
+            <button class="tab-btn" data-tab="tab-settings">Engine Settings</button>
+          </div>
+
+          <!-- Profile Tab -->
+          <div class="tab-content active" id="tab-profile">
+            <form id="profile-form">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="prof-name" name="fullName" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="prof-email" name="email" required>
+                </div>
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" id="prof-phone" name="phone" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Total Experience (Years)</label>
+                  <input type="number" id="prof-exp" name="experience" step="0.5" required>
+                </div>
+                <div class="form-group">
+                  <label>Notice Period</label>
+                  <select id="prof-notice">
+                    <option value="Immediate" selected>Immediate (0 Days)</option>
+                    <option value="15 Days">15 Days</option>
+                    <option value="30 Days">30 Days</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Current CTC (LPA)</label>
+                  <input type="number" id="prof-cctc" step="0.1" value="3.6">
+                </div>
+                <div class="form-group">
+                  <label>Expected CTC (LPA)</label>
+                  <input type="number" id="prof-ectc" step="0.1" value="6.0">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Current Location</label>
+                <input type="text" id="prof-location" value="Chennai 600100">
+              </div>
+
+              <div class="form-group">
+                <label>LinkedIn URL</label>
+                <input type="url" id="prof-linkedin">
+              </div>
+
+              <div class="form-group">
+                <label>Active Resume PDF</label>
+                <div class="resume-input-group">
+                  <input type="text" id="prof-resume" readonly>
+                  <span class="file-status-badge">Attached</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-secondary full-width">Save Profile Details</button>
+            </form>
+          </div>
+
+          <!-- Settings Tab -->
+          <div class="tab-content" id="tab-settings">
+            <form id="settings-form">
+              <div class="form-group">
+                <label>Target Job Keyword</label>
+                <input type="text" id="set-keyword" value="Node.js Developer">
+              </div>
+              <div class="form-group">
+                <label>Location Preference</label>
+                <input type="text" id="set-location" value="Chennai, Bangalore, Thiruvananthapuram, Hyderabad">
+              </div>
+              <div class="form-group checkbox-row">
+                <input type="checkbox" id="set-headless">
+                <label for="set-headless">Run in Background (Headless Mode)</label>
+              </div>
+              <div class="form-group checkbox-row">
+                <input type="checkbox" id="set-autosubmit" checked>
+                <label for="set-autosubmit">Auto-Submit Form Once Filled</label>
+              </div>
+              <button type="submit" class="btn btn-secondary full-width">Update Settings</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Discovered Jobs Preview Table Section -->
+    <section class="discovered-section" id="discovered-section" style="margin-bottom: 28px;">
+      <div class="glass-card highlight-border" style="border: 1px solid rgba(0, 210, 255, 0.25); background: linear-gradient(180deg, rgba(16, 26, 46, 0.8) 0%, rgba(10, 17, 32, 0.8) 100%);">
+        <div class="card-header" style="flex-wrap: wrap; gap: 14px; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h3 style="margin: 0; font-size: 18px; color: #fff;">🎯 Filtered Jobs List</h3>
+              <span class="badge" id="discovered-count-badge" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff; border-color: rgba(0, 210, 255, 0.3); font-weight: 700;">0 Jobs Found</span>
+            </div>
+            <p class="section-desc" style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-secondary);">Jobs discovered via filter criteria. Separate open jobs from already applied jobs using the tabs below.</p>
+          </div>
+
+          <!-- Segmented Filter Tabs: Ready to Apply (Default) / Already Applied / All Jobs -->
+          <div class="discovered-tabs" style="display: flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.45); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <button class="discovered-tab-btn active" data-tab="ready" id="tab-btn-ready" style="background: linear-gradient(135deg, #00d2ff, #3a7bd5); color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 12px rgba(0,210,255,0.35); transition: all 0.2s;">
+              <span>⚡ Open / Ready</span>
+              <span class="pill-count" id="count-ready" style="background: rgba(255,255,255,0.25); padding: 1px 7px; border-radius: 10px; font-size: 11px;">0</span>
+            </button>
+            <button class="discovered-tab-btn" data-tab="applied" id="tab-btn-applied" style="background: transparent; color: var(--text-secondary); border: none; padding: 7px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+              <span>📁 Already Applied</span>
+              <span class="pill-count" id="count-applied" style="background: rgba(255,255,255,0.08); padding: 1px 7px; border-radius: 10px; font-size: 11px;">0</span>
+            </button>
+            <button class="discovered-tab-btn" data-tab="all" id="tab-btn-all" style="background: transparent; color: var(--text-secondary); border: none; padding: 7px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+              <span>🌐 All Jobs</span>
+              <span class="pill-count" id="count-total" style="background: rgba(255,255,255,0.08); padding: 1px 7px; border-radius: 10px; font-size: 11px;">0</span>
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+            <button id="btn-toggle-select-all" class="btn btn-secondary" style="padding: 8px 14px; font-size: 12.5px;">
+              Toggle All
+            </button>
+            <button id="btn-apply-all-selected" class="btn btn-primary" style="padding: 10px 22px; font-size: 14.5px; font-weight: 800; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); box-shadow: 0 4px 20px rgba(0, 210, 255, 0.35); display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>APPLY ALL (<span id="selected-jobs-count">0</span>)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container" style="max-height: 520px; overflow-y: auto;">
+          <table class="discovered-table history-table">
+            <thead>
+              <tr>
+                <th style="width: 44px; text-align: center;"><input type="checkbox" id="th-select-all" checked></th>
+                <th>Company Name</th>
+                <th>Role / Position</th>
+                <th>Experience & Location</th>
+                <th>Salary</th>
+                <th>Apply Type</th>
+                <th>Apply Link</th>
+                <th>Status & Action</th>
+              </tr>
+            </thead>
+            <tbody id="discovered-tbody">
+              <tr>
+                <td colspan="8" class="empty-state" style="padding: 40px 16px; text-align: center; color: var(--text-secondary);">
+                  🔍 No jobs fetched yet. Configure filters above and click <strong style="color: #00d2ff;">"SEARCH & FILTER JOBS"</strong> to display matching jobs!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Discovered Jobs Pagination Controls Bar (20 per page) -->
+        <div class="pagination-container" id="discovered-pagination-wrapper" style="display: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 14px; padding-top: 14px;">
+          <div class="pagination-info" id="discovered-pagination-info">
+            Showing <strong id="discovered-pagination-range" style="color: var(--accent-cyan);">0-0</strong> of <strong id="discovered-pagination-total" style="color: #fff;">0</strong> filtered jobs
+          </div>
+          <div class="pagination-controls">
+            <button class="btn-page" id="btn-discovered-page-first" title="First Page">« First</button>
+            <button class="btn-page" id="btn-discovered-page-prev" title="Previous Page">‹ Prev</button>
+            <div class="page-numbers" id="discovered-pagination-numbers">
+              <!-- Dynamically populated page pills (1, 2, 3...) -->
+            </div>
+            <button class="btn-page" id="btn-discovered-page-next" title="Next Page">Next ›</button>
+            <button class="btn-page" id="btn-discovered-page-last" title="Last Page">Last »</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Application History & Screenshot Proofs -->
+    <section class="history-section">
+      <div class="glass-card">
+        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3>📂 Applied Applications History & Proofs</h3>
+            <span style="font-size: 12.5px; color: var(--text-secondary);">Filtered to prevent any duplicate re-applications</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <select id="date-filter-select" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 13px;">
+              <option value="today" selected>📅 Today's Applications</option>
+              <option value="yesterday">📅 Yesterday</option>
+              <option value="all">📅 All Time Records</option>
+            </select>
+            <span class="badge" id="history-count">0 Records</span>
+          </div>
+        </div>
+
+        <div id="analytics-summary-bar" style="margin-bottom: 16px; padding: 10px 14px; background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.15); border-radius: var(--radius-sm); font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+          <span id="analytics-summary-text">Loading today's stats...</span>
+          <button id="btn-refresh-naukri-count" class="btn-text" style="color: var(--accent-cyan); font-weight: 600;">🔍 Verify Naukri Applies Count</button>
+        </div>
+        <div class="table-container">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Job Title & Company</th>
+                <th>Application Type</th>
+                <th>Status</th>
+                <th>Applied At</th>
+                <th>Job Link</th>
+                <th>Proof & Logs</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <tr>
+                <td colspan="6" class="empty-state">No applications submitted yet. Click "START 100 JOBS AUTO-APPLY" above to start!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls Bar (10 per page, recent first) -->
+        <div class="pagination-container" id="pagination-wrapper">
+          <div class="pagination-info" id="pagination-info">
+            Showing <strong id="pagination-range" style="color: var(--accent-cyan);">0-0</strong> of <strong id="pagination-total" style="color: #fff;">0</strong> applications
+          </div>
+          <div class="pagination-controls">
+            <button class="btn-page" id="btn-page-first" title="First Page">« First</button>
+            <button class="btn-page" id="btn-page-prev" title="Previous Page">‹ Prev</button>
+            <div class="page-numbers" id="pagination-numbers">
+              <!-- Dynamically populated page pills (1, 2, 3...) -->
+            </div>
+            <button class="btn-page" id="btn-page-next" title="Next Page">Next ›</button>
+            <button class="btn-page" id="btn-page-last" title="Last Page">Last »</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal for viewing screenshot proof -->
+    <div id="proof-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">Submission Proof Screenshot</h3>
+          <button class="modal-close" id="btn-close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <img id="modal-img" src="" alt="Proof Screenshot">
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for viewing detailed application log & audit info -->
+    <div id="log-modal" class="modal">
+      <div class="modal-content" style="max-width: 620px; background: #0c1424; border: 1px solid rgba(0, 210, 255, 0.3); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">📋</span>
+            <h3 id="log-modal-title" style="margin: 0; font-size: 17px; color: #fff;">Application Execution Log & Details</h3>
+          </div>
+          <button class="modal-close" id="btn-close-log-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="log-modal-body" style="padding: 18px; text-align: left; max-height: 80vh; overflow-y: auto;">
+          <!-- Dynamically populated log details -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

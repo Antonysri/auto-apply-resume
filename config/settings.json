@@ -1,0 +1,25 @@
+{
+  "search": {
+    "keyword": "Node.js Developer",
+    "location": "Chennai, Bangalore, Thiruvananthapuram, Hyderabad",
+    "experience": 5,
+    "freshness": 7
+  },
+  "browser": {
+    "headless": false,
+    "slowMoMs": 80,
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    }
+  },
+  "limits": {
+    "maxApplicationsPerSession": 100,
+    "pauseBetweenJobsMs": 3500
+  },
+  "automation": {
+    "autoSubmit": true,
+    "captureProofs": true,
+    "saveHtmlOnFailure": true
+  }
+}
